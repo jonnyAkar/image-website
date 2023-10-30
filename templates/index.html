@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Uploader</title>
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+    <div class="selection">
+        <label>Number of images:</label>
+        <select id="imageCount">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+        <button onclick="applySelection()">Apply</button>
+    </div>
+    <div class="container">
+           
+    </div>
+
+    <script>
+        function displayImage(input) {
+            if (input.files && input.files.length > 1) {
+                const parentDiv = input.parentElement;
+                let loadedImagesCount = 0;
+                let imageUrls = [];
+
+                const onAllImagesLoaded = () => {
+                    parentDiv.dataset.images = JSON.stringify(imageUrls);
+                    parentDiv.dataset.currentIndex = 0;
+                    parentDiv.style.backgroundImage = `url(${imageUrls[0]})`;
+                    //updateImageNavigationButtons(parentDiv);
+                };
+
+                for (let i = 0; i < input.files.length; i++) {
+                    const imageUrl = URL.createObjectURL(input.files[i]);
+                    imageUrls.push(imageUrl);
+
+                    const img = new Image();
+                    img.src = imageUrl;
+                    img.onload = () => {
+                        loadedImagesCount++;
+                        if (loadedImagesCount === input.files.length) {
+                            onAllImagesLoaded();
+                        }
+                    };
+                }
+            }
+            else{
+                const parentDiv = input.parentElement;
+
+                const imageUrl = URL.createObjectURL(input.files[0]);
+
+                parentDiv.style.backgroundImage = `url(${imageUrl})`;
+            }
+        }
+
+        function nextImage(button) {
+            const parentDiv = button.parentElement;
+            let currentIndex = parseInt(parentDiv.dataset.currentIndex);
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            currentIndex = (currentIndex + 1) % images.length;
+            parentDiv.style.backgroundImage = `url(${images[currentIndex]})`;
+
+            parentDiv.dataset.currentIndex = currentIndex;
+
+            //updateImageNavigationButtons(parentDiv);
+        }
+
+        function prevImage(button) {
+            const parentDiv = button.parentElement;
+            let currentIndex = parseInt(parentDiv.dataset.currentIndex);
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            parentDiv.style.backgroundImage = `url(${images[currentIndex]})`;
+
+            parentDiv.dataset.currentIndex = currentIndex;
+
+            //updateImageNavigationButtons(parentDiv);
+        }
+
+        function mouseEnter(parentDiv) {
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            if (images.length > 1) {
+                parentDiv.querySelector('.next-image').style.display = 'block' ;
+                parentDiv.querySelector('.prev-image').style.display = 'block' ;
+            }
+        }
+
+        function mouseLeft(parentDiv) {
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            if (images.length > 1) {
+                parentDiv.querySelector('.next-image').style.display = 'none';
+                parentDiv.querySelector('.prev-image').style.display = 'none';
+            }
+        }
+
+        document.querySelectorAll('.image-container').forEach(div => {
+            div.addEventListener('click', () => {
+                div.querySelector('.upload').click();
+            });
+        });
+
+        function applySelection() {
+            const count = parseInt(document.getElementById('imageCount').value);
+            const container = document.querySelector('.container');
+            const currentCount = container.children.length;
+
+            // Add new squares if needed
+            for(let i = currentCount; i < count; i++) {
+                const div = document.createElement('div');
+                div.classList.add('image-container');
+
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.classList.add('upload');
+                input.accept = 'image/*';
+                input.multiple = true;
+                input.addEventListener('change', function() { displayImage(this); });
+
+                const prevButton = document.createElement('button');
+                prevButton.innerText = "Previous";
+                prevButton.classList.add('prev-image');
+                prevButton.style.display = "none";
+                prevButton.onclick = function() { prevImage(this); }
+
+                const nextButton = document.createElement('button');
+                nextButton.innerText = "Next";
+                nextButton.classList.add('next-image');
+                nextButton.style.display = "none";
+                nextButton.onclick = function() { nextImage(this); }
+
+                div.appendChild(input);
+                div.appendChild(prevButton);
+                div.appendChild(nextButton);
+
+                container.appendChild(div);
+
+                // Attach click event to new div (excluding the input area for uploading)
+                div.addEventListener('click', function(event) {
+                    if (event.target === this) {
+                        this.querySelector('.upload').click();
+                    }
+                });
+
+                const parentDiv = this.parentElement;
+                div.addEventListener('mouseover', function(event) {
+                    if (event.target === this) {
+                        mouseEnter(div);
+                    }
+                });
+
+                div.addEventListener('mouseleave', function(event) {
+                    if (event.target === this) {
+                        console.log("MOUSELEFT");
+                        mouseLeft(div);
+                    }
+                });
+
+
+
+            }
+
+        // Remove excess squares if needed
+        while (container.children.length > count) {
+            container.removeChild(container.lastChild);
+        }
+}
+
+
+        window.onload = applySelection;
+
+    </script>
+</body>
+</html>
+
+
+
+
+
