@@ -23,6 +23,7 @@
     <script>
         function displayImage(input) {
             //new images to upload, replaces all of the current images
+            console.log("REPLACING IMAGE");
             if (input.files && input.files.length > 1) {
                 const parentDiv = input.parentElement;
                 let loadedImagesCount = 0;
@@ -32,7 +33,7 @@
                     parentDiv.dataset.images = JSON.stringify(imageUrls);
                     parentDiv.dataset.currentIndex = 0;
                     parentDiv.style.backgroundImage = `url(${imageUrls[0]})`;
-                    //updateImageNavigationButtons(parentDiv);
+                    input.value = '';
                 };
 
                 for (let i = 0; i < input.files.length; i++) {
@@ -50,6 +51,7 @@
                 }
             }
             else{
+               
                 const parentDiv = input.parentElement;
 
                 const imageUrl = URL.createObjectURL(input.files[0]);
@@ -57,26 +59,28 @@
                 parentDiv.style.backgroundImage = `url(${imageUrl})`;
                 parentDiv.dataset.currentIndex = 0;
                 parentDiv.dataset.images = JSON.stringify([imageUrl]);
-
+                input.value = '';
             }
         }
 
         function addImage(input){
             //implement this, users can add image instead of replace
-            const parentDiv = input.parentElement.parentElement;
+
+            const parentDiv = input.parentElement;
             let loadedImagesCount = 0;
             let imageUrls = [];
-
+            console.log("ADDING IMAGE");
             const onAllImagesLoaded = () => {
                 currentImages = JSON.parse(parentDiv.dataset.images);
-                console.log("Current: ", currentImages);
-                console.log("add this: ", imageUrls);
+                //console.log("Current: ", currentImages);
+                //console.log("add this: ", imageUrls);
 
                 for (let i=0; i<imageUrls.length;i++){
                     currentImages.push(imageUrls[i]);
                 }
-                console.log("Now: ", currentImages);
+                //console.log("Now: ", currentImages);
                 parentDiv.dataset.images = JSON.stringify(currentImages);
+                input.value = '';
             };
             for (let i = 0; i < input.files.length; i++) {
                 const imageUrl = URL.createObjectURL(input.files[i]);
@@ -163,7 +167,8 @@
                 input.classList.add('upload');
                 input.accept = 'image/*';
                 input.multiple = true;
-                input.addEventListener('change', function() { displayImage(this); });
+                input.addEventListener('change', function() { 
+                    displayImage(this); });
 
                 const prevButton = document.createElement('button');
                 prevButton.innerText = "Previous";
@@ -178,16 +183,16 @@
                 const buttonInput = document.createElement('input');
                 buttonInput.type = 'file';
                 buttonInput.accept = 'image/*';
+                buttonInput.classList.add('button-upload');
                 buttonInput.multiple = true;
-                buttonInput.style.display = 'none'; 
                 buttonInput.addEventListener('change', function() { 
                     addImage(this); 
                 });
 
                 const plusButton = document.createElement('div');
                 plusButton.classList.add('plus-button');
-                plusButton.appendChild(buttonInput);
-
+                
+                div.appendChild(buttonInput);
                 div.appendChild(plusButton);
                 div.appendChild(input);
                 div.appendChild(prevButton);
@@ -196,13 +201,15 @@
                 container.appendChild(div);
 
                 div.addEventListener('click', function(event) {
-                    if (event.target === this) {
+                    if (event.target === plusButton) {
+                        console.log("ADD");
+                        this.querySelector('.button-upload').click();
+                        
+                    }
+                    else if (event.target === this) {
+                        console.log("REPLACE");
                         this.querySelector('.upload').click();
                     }
-                });
-
-                plusButton.addEventListener('click', function() {
-                    buttonInput.click();  
                 });
 
                 const parentDiv = this.parentElement;
@@ -218,8 +225,6 @@
                     }
                 });
 
-
-
             }
 
         // Remove excess squares if needed
@@ -228,14 +233,10 @@
         }
 }
 
-
         window.onload = applySelection;
 
     </script>
 </body>
 </html>
-
-
-
 
 

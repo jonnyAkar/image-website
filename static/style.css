@@ -46,6 +46,10 @@
 .upload {
 	display: none;
 }
+.button-upload {
+	display: none;
+}
+
 
 
 .next-image {
