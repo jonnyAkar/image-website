@@ -22,6 +22,7 @@
 
     <script>
         function displayImage(input) {
+            //new images to upload, replaces all of the current images
             if (input.files && input.files.length > 1) {
                 const parentDiv = input.parentElement;
                 let loadedImagesCount = 0;
@@ -54,6 +55,41 @@
                 const imageUrl = URL.createObjectURL(input.files[0]);
 
                 parentDiv.style.backgroundImage = `url(${imageUrl})`;
+                parentDiv.dataset.currentIndex = 0;
+                parentDiv.dataset.images = JSON.stringify([imageUrl]);
+
+            }
+        }
+
+        function addImage(input){
+            //implement this, users can add image instead of replace
+            const parentDiv = input.parentElement.parentElement;
+            let loadedImagesCount = 0;
+            let imageUrls = [];
+
+            const onAllImagesLoaded = () => {
+                currentImages = JSON.parse(parentDiv.dataset.images);
+                console.log("Current: ", currentImages);
+                console.log("add this: ", imageUrls);
+
+                for (let i=0; i<imageUrls.length;i++){
+                    currentImages.push(imageUrls[i]);
+                }
+                console.log("Now: ", currentImages);
+                parentDiv.dataset.images = JSON.stringify(currentImages);
+            };
+            for (let i = 0; i < input.files.length; i++) {
+                const imageUrl = URL.createObjectURL(input.files[i]);
+                imageUrls.push(imageUrl);
+
+                const img = new Image();
+                img.src = imageUrl;
+                img.onload = () => {
+                    loadedImagesCount++;
+                    if (loadedImagesCount === input.files.length) {
+                        onAllImagesLoaded();
+                    }
+                };
             }
         }
 
@@ -67,7 +103,6 @@
 
             parentDiv.dataset.currentIndex = currentIndex;
 
-            //updateImageNavigationButtons(parentDiv);
         }
 
         function prevImage(button) {
@@ -80,25 +115,31 @@
 
             parentDiv.dataset.currentIndex = currentIndex;
 
-            //updateImageNavigationButtons(parentDiv);
         }
 
         function mouseEnter(parentDiv) {
             const images = JSON.parse(parentDiv.dataset.images);
 
+            parentDiv.querySelector('.plus-button').style.display = 'block';
+
+
             if (images.length > 1) {
                 parentDiv.querySelector('.next-image').style.display = 'block' ;
                 parentDiv.querySelector('.prev-image').style.display = 'block' ;
             }
+
         }
 
         function mouseLeft(parentDiv) {
             const images = JSON.parse(parentDiv.dataset.images);
 
+            parentDiv.querySelector('.plus-button').style.display = 'none';
+
             if (images.length > 1) {
                 parentDiv.querySelector('.next-image').style.display = 'none';
                 parentDiv.querySelector('.prev-image').style.display = 'none';
             }
+
         }
 
         document.querySelectorAll('.image-container').forEach(div => {
@@ -127,26 +168,41 @@
                 const prevButton = document.createElement('button');
                 prevButton.innerText = "Previous";
                 prevButton.classList.add('prev-image');
-                prevButton.style.display = "none";
                 prevButton.onclick = function() { prevImage(this); }
 
                 const nextButton = document.createElement('button');
                 nextButton.innerText = "Next";
                 nextButton.classList.add('next-image');
-                nextButton.style.display = "none";
                 nextButton.onclick = function() { nextImage(this); }
 
+                const buttonInput = document.createElement('input');
+                buttonInput.type = 'file';
+                buttonInput.accept = 'image/*';
+                buttonInput.multiple = true;
+                buttonInput.style.display = 'none'; 
+                buttonInput.addEventListener('change', function() { 
+                    addImage(this); 
+                });
+
+                const plusButton = document.createElement('div');
+                plusButton.classList.add('plus-button');
+                plusButton.appendChild(buttonInput);
+
+                div.appendChild(plusButton);
                 div.appendChild(input);
                 div.appendChild(prevButton);
                 div.appendChild(nextButton);
 
                 container.appendChild(div);
 
-                // Attach click event to new div (excluding the input area for uploading)
                 div.addEventListener('click', function(event) {
                     if (event.target === this) {
                         this.querySelector('.upload').click();
                     }
+                });
+
+                plusButton.addEventListener('click', function() {
+                    buttonInput.click();  
                 });
 
                 const parentDiv = this.parentElement;
@@ -158,7 +214,6 @@
 
                 div.addEventListener('mouseleave', function(event) {
                     if (event.target === this) {
-                        console.log("MOUSELEFT");
                         mouseLeft(div);
                     }
                 });
