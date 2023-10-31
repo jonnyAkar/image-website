@@ -126,7 +126,6 @@
 
             parentDiv.querySelector('.plus-button').style.display = 'block';
 
-
             if (images.length > 1) {
                 parentDiv.querySelector('.next-image').style.display = 'block' ;
                 parentDiv.querySelector('.prev-image').style.display = 'block' ;
@@ -138,11 +137,9 @@
             const images = JSON.parse(parentDiv.dataset.images);
 
             parentDiv.querySelector('.plus-button').style.display = 'none';
-
-            if (images.length > 1) {
-                parentDiv.querySelector('.next-image').style.display = 'none';
-                parentDiv.querySelector('.prev-image').style.display = 'none';
-            }
+            parentDiv.querySelector('.next-image').style.display = 'none';
+            parentDiv.querySelector('.prev-image').style.display = 'none';
+            
 
         }
 
