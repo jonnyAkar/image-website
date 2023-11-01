@@ -15,16 +15,25 @@
             <option value="3">3</option>
             <option value="4">4</option>
         </select>
-        <button onclick="applySelection()">Apply</button>
+        <button class = "apply" onclick="applySelection()">Apply</button>
         <button class="random" onclick="randomizeAll()">Randomize</button>
         <button class="screenshot" onclick="captureScreenshot()">Screenshot</button>
-
+        <button class="toggle-background" onclick="toggleBackground()">Toggle Background</button>
     </div>
     <div class="container">
            
     </div>
 
     <script>
+        function toggleBackground(){
+            //toggle color of the body. If white make it black. if black make it white
+            const body = document.querySelector('.container');
+            if (window.getComputedStyle(body).backgroundColor === "rgb(255, 255, 255)") {
+                body.style.backgroundColor = "black";
+            } else {
+                body.style.backgroundColor = "white";
+            }
+        }
         function captureScreenshot() {
             const container = document.querySelector('.container');
 
