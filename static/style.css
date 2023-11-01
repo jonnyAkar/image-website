@@ -17,6 +17,18 @@
 	height: 100vh;
 }
 
+.screenshot{
+    position: fixed; 
+    top: 10px;       
+    right: 10px;  
+}
+
+.random{
+    position: fixed; 
+    top: 10px;       
+    right: 100px;  
+}
+
 .image-container {
     position: relative;
     max-width: 300px;
@@ -24,7 +36,7 @@
 	padding-bottom: 20%;
     overflow: hidden;
 	background-color: grey;
-	margin: 25px;
+	margin: 35px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -50,8 +62,6 @@
 	display: none;
 }
 
-
-
 .next-image {
     position: absolute;
     bottom: 10px;
@@ -66,6 +76,16 @@
     position: absolute;
     bottom: 10px;
     left: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: none;
+}
+.random-image {
+    position: absolute;
+    left: 10px;
+    top: 10px;
     background-color: rgba(255, 255, 255, 0.7);
     border: none;
     padding: 5px 10px;
