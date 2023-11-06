@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Uploader</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="selection">
+        
+        <label for="image-input">Upload Images:</label>
+        <input type="file" id="image-input" multiple>
+
+        <button class="random" onclick="randomizeAll()">Randomize</button>
+        <button class="screenshot" onclick="captureScreenshot()">Screenshot</button>
+        <button class="toggle-background" onclick="toggleBackground()">Toggle Background</button>
+    </div>
+    <div class="gallery">
+        <hr class="hline">
+        <div class="wall-selection">
+            <h3 class="wall-labels">Wall 1</h3>
+            <button class="random-wall" onclick="randomizeWall(1)">Randomize Wall</button>
+            <label class="wall-labels" for="num-walls">Number of images:</label>
+            <select name="num-walls" id="num-walls-select1" class="num-walls-select">
+                <option value="3">3</option>
+                <option value="2">2</option>
+            </select>
+            <button class = "apply" onclick="updateWall(1)">Apply</button>
+        </div>
+
+        <div class="container" id="g1"> 
+        </div>
+
+        <hr class="hline">
+        <div class="wall-selection">
+            <h3>Wall 2</h3>
+            <button class="random-wall" onclick="randomizeWall(2)">Randomize Wall</button>
+            <label for="num-walls">Number of images:</label>
+            <select name="num-walls" id="num-walls-select2" class="num-walls-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <button class = "apply" onclick="updateWall(2)">Apply</button>
+        </div>
+        <div class="container" id="g2">
+            
+
+        </div>
+        <hr class="hline">
+        <div class="wall-selection">
+            <h3>Wall 3</h3>
+            <button class="random-wall" onclick="randomizeWall(3)">Randomize Wall</button>
+            <label for="num-walls">Number of images:</label>
+            <select name="num-walls" id="num-walls-select3" class="num-walls-select">
+                <option value="2">2</option>
+                <option value="1">1</option>
+            </select>
+            <button class = "apply" onclick="updateWall(3)">Apply</button>
+        </div>
+        <div class="container" id="g3">
+            
+
+        </div>
+        <hr class="hline">
+        <div class="wall-selection">
+            <h3>Wall 4</h3>
+            <button class="random-wall" onclick="randomizeWall(4)">Randomize Wall</button>
+            <label for="num-walls">Number of images:</label>
+            <select name="num-walls" id="num-walls-select4" class="num-walls-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <button class = "apply" onclick="updateWall(4)">Apply</button>
+        </div>
+        <div class="container" id="g4">
+            
+
+        </div>
+        <hr class="hline">
+        <div class="wall-selection">
+            <h3>Wall 5</h3>
+            <button class="random-wall" onclick="randomizeWall(5)">Randomize Wall</button>
+            <label for="num-walls">Number of images:</label>
+            <select name="num-walls" id="num-walls-select5" class="num-walls-select">
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="3">3</option>
+            </select>
+            <button class = "apply" onclick="updateWall(5)">Apply</button>
+        </div>
+        <div class="container" id="g5">
+            
+
+        </div>
+        <hr class="hline">
+        <div class="wall-selection">
+            <h3>Wall 6</h3>
+            <button class="random-wall" onclick="randomizeWall(6)">Randomize Wall</button>
+            <label for="num-walls">Number of images:</label>
+            <select name="num-walls" id="num-walls-select6" class="num-walls-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <button class = "apply" onclick="updateWall(6)">Apply</button>
+        </div>
+        <div class="container" id="g6">
+            
+
+        </div>
+        <hr class="hline">
+        <div class="wall-selection">
+                <h3>Wall 7</h3>
+                <button class="random-wall" onclick="randomizeWall(7)">Randomize Wall</button>
+                <label for="num-walls">Number of images:</label>
+                <select name="num-walls" id="num-walls-select7" class="num-walls-select">
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                </select>
+                <button class = "apply" onclick="updateWall(7)">Apply</button>
+            </div>
+        <div class="container" id="g7">
+            
+        </div>
+    </div>
+
+    <script>
+        const lockedImages = [];
+
+        function randomizeWall(wall){
+            const count = getValueOfWall(String(wall));
+            const id = 'g' + String(wall);
+            const container = document.getElementById(id);
+            const imageContainers = container.querySelectorAll('.image-container');
+
+            imageContainers.forEach(imageContainer => {
+                const button = imageContainer.querySelector('.random-image');
+                if (!button.parentElement.isLocked){
+                    randomize(button);
+                }
+            });
+        }
+
+
+        function lockImage(button){
+            const parentDiv = button.parentElement;
+
+            isLocked = parentDiv.isLocked;
+
+            const currentIndex = parseInt(parentDiv.dataset.currentIndex);
+            const images = JSON.parse(parentDiv.dataset.images);
+            currentImageName = images[currentIndex].name;
+
+            if (!isLocked){ //lock the image
+                button.innerText = "Unlock";
+                lockedImages.push(currentImageName);
+                parentDiv.isLocked = !isLocked;
+                mouseEnter(parentDiv);
+            }
+            else{
+                button.innerText = "Lock";
+                //remove currentImage from lockedImages
+                const indexToRemove = lockedImages.indexOf(currentImageName);
+                if (indexToRemove > -1) {
+                    lockedImages.splice(indexToRemove, 1);
+                }
+                parentDiv.isLocked = !isLocked;
+                mouseEnter(parentDiv);
+            }
+        }
+
+        function toggleBackground(){
+            //toggle color of the body. If white make it black. if black make it white
+            
+            document.querySelectorAll('.container').forEach(body => {
+                if (window.getComputedStyle(body).backgroundColor === "rgb(255, 255, 255)") {
+                    body.style.backgroundColor = "black";
+                } else {
+                    body.style.backgroundColor = "white";
+                }
+            });
+
+        }
+        
+        function captureScreenshot() {
+            const container = document.querySelector('.gallery');
+
+            html2canvas(container).then(function(canvas) {
+                // You can append the canvas element to the document to see the screenshot
+                // document.body.appendChild(canvas);
+
+                // Or convert it to an image and download it
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL();
+                link.download = 'screenshot.png';
+                link.click();
+            });
+        }
+
+        function uploadImagesToSquare(input, parentDiv) {
+        // New images to upload, replaces all of the current images
+        if (input.files && input.files.length > 1) {
+            let loadedImagesCount = 0;
+            let imageUrls = [];
+
+            const onAllImagesLoaded = () => {
+                // Filter out locked images before setting them
+                const unlockedImageUrls = imageUrls.filter(image => !lockedImages.includes(image.name));
+                parentDiv.dataset.images = JSON.stringify(unlockedImageUrls);
+                if (unlockedImageUrls.length > 0) {
+                    parentDiv.dataset.currentIndex = 0;
+                    parentDiv.style.backgroundImage = `url(${unlockedImageUrls[0].url})`;
+                } else {
+                    // Handle the case where all new images are locked
+                    console.log('All uploaded images are locked.');
+                    // You might want to keep the current image or set a default background
+                }
+                parentDiv.isLocked = false;
+            };
+
+            for (let i = 0; i < input.files.length; i++) {
+                const imageName = input.files[i].name;
+
+                // Only create blob URLs for unlocked images
+                if (!lockedImages.includes(imageName)) {
+                    const imageUrl = URL.createObjectURL(input.files[i]);
+                    imageUrls.push({ url: imageUrl, name: imageName });
+
+                    const img = new Image();
+                    img.src = imageUrl;
+                    img.onload = () => {
+                        loadedImagesCount++;
+                        if (loadedImagesCount === input.files.length) {
+                            onAllImagesLoaded();
+                        }
+                    };
+                } else {
+                    // Skip locked images but increment the loadedImagesCount
+                    loadedImagesCount++;
+                    if (loadedImagesCount === input.files.length) {
+                        onAllImagesLoaded();
+                    }
+                }
+            }
+        }
+        else if (input.files) {
+            const imageName = input.files[0].name;
+
+            // Only proceed if the image is unlocked
+            if (!lockedImages.includes(imageName)) {
+                const imageUrl = URL.createObjectURL(input.files[0]);
+
+                parentDiv.style.backgroundImage = `url(${imageUrl})`;
+                parentDiv.dataset.currentIndex = 0;
+                parentDiv.dataset.images = JSON.stringify([{ url: imageUrl, name: imageName }]);
+                parentDiv.isLocked = false;
+            } else {
+                // Handle the case where the single new image is locked
+                console.log('The uploaded image is locked.');
+                // You might want to keep the current image or set a default background
+            }
+        }
+    }
+
+        function uploadImages(input, parentDiv) {
+            //new images to upload, replaces all of the current images
+            if (input.files && input.files.length > 1) {
+                let loadedImagesCount = 0;
+                let imageUrls = [];
+
+                const onAllImagesLoaded = () => {
+                    parentDiv.dataset.images = JSON.stringify(imageUrls);
+                    parentDiv.dataset.currentIndex = 0;
+                    parentDiv.isLocked = false;
+                    parentDiv.style.backgroundImage = `url(${imageUrls[0].url})`;
+                };
+
+                for (let i = 0; i < input.files.length; i++) {
+                    const imageName = input.files[i].name;
+                    const imageUrl = URL.createObjectURL(input.files[i]);
+
+                    imageUrls.push({url: imageUrl, name:imageName});
+
+                    const img = new Image();
+                    img.src = imageUrl;
+                    img.onload = () => {
+                        loadedImagesCount++;
+                        if (loadedImagesCount === input.files.length) {
+                            onAllImagesLoaded();
+                        }
+                    };
+                }
+            }
+            else{
+               
+                const imageUrl = URL.createObjectURL(input.files[0]);
+                const imageName = input.files[0].name; 
+
+                parentDiv.style.backgroundImage = `url(${imageUrl})`;
+                parentDiv.dataset.currentIndex = 0;
+                parentDiv.dataset.images = JSON.stringify([{ url: imageUrl, name: imageName }]);
+                parentDiv.isLocked = false;
+                
+            }
+        }
+
+        function deleteImage(button, div){
+            imageContainer = button.parentElement;
+            images = JSON.parse(imageContainer.dataset.images);
+            index = imageContainer.dataset.currentIndex;            
+
+            images.splice(index, 1);
+
+            imageContainer.dataset.images = JSON.stringify(images); //new images
+
+            if (images.length == 0){
+                imageContainer.dataset.currentIndex = 0;
+                imageContainer.style.backgroundImage = ``;
+            } 
+            else if (index == images.length){
+                imageContainer.dataset.currentIndex = 0;
+                imageContainer.style.backgroundImage = `url(${images[0].url})`;
+            }
+            else{
+                imageContainer.style.backgroundImage = `url(${images[index].url})`;
+            }
+
+            if (images.length == 1){
+                div.querySelector('.random-image').style.display = 'none';
+                div.querySelector('.next-image').style.display = 'none';
+                div.querySelector('.prev-image').style.display = 'none';
+            }
+            if (images.length == 0){
+                div.querySelector('.delete-button').style.display = 'none';
+                div.querySelector('.lock-image').style.display = 'none';
+
+                div.querySelector('.plus-button').style.display = 'none';
+            }
+
+        }
+
+        function addImage(input){
+            
+            const parentDiv = input.parentElement;
+            let loadedImagesCount = 0;
+            let imageUrls = [];
+            console.log("ADDING IMAGE");
+            const onAllImagesLoaded = () => {
+                
+                currentImages = JSON.parse(parentDiv.dataset.images);
+                for (let imageUrl of imageUrls) {
+                    if (!lockedImages.includes(imageUrl.name)) {
+                        currentImages.push(imageUrl);
+                    }else{
+                        console.log("here");
+                    }
+                }
+                parentDiv.dataset.images = JSON.stringify(currentImages);
+                input.value = '';
+            }
+            for (let i = 0; i < input.files.length; i++) {
+                const imageUrl = URL.createObjectURL(input.files[i]);
+                const imageName = input.files[i].name;
+
+                imageUrls.push({url: imageUrl, name:imageName});
+
+                const img = new Image();
+                img.src = imageUrl;
+                img.onload = () => {
+                    loadedImagesCount++;
+                    if (loadedImagesCount === input.files.length) {
+                        onAllImagesLoaded();
+                    }
+                };
+            }
+        }
+
+        function randomize(button){
+            const parentDiv = button.parentElement;
+            let allImages = JSON.parse(parentDiv.dataset.images);
+            
+            const unlockedImages = allImages.filter(image => !lockedImages.includes(image.name));
+            const lockedImageObjects = allImages.filter(image => lockedImages.includes(image.name));
+            
+            unlockedImages.sort(() => 0.5 - Math.random());
+
+            allImages = unlockedImages.concat(lockedImageObjects);
+
+            parentDiv.dataset.images = JSON.stringify(allImages);
+            parentDiv.dataset.currentIndex = 0; // Reset index since we've shuffled
+
+            if (unlockedImages.length > 0) {
+                parentDiv.style.backgroundImage = `url(${unlockedImages[0].url})`;
+            } else {
+                console.log('There are no unlocked images to display.');
+            }
+        }
+
+        function randomizeAll(){
+            const containers = document.querySelectorAll('.image-container');
+
+            containers.forEach(container => {
+                const button = container.querySelector('.random-image');
+                if (!button.parentElement.isLocked){
+                    randomize(button);
+                }
+            });
+        }
+
+        function nextImage(button) {
+            const parentDiv = button.parentElement;
+            let currentIndex = parseInt(parentDiv.dataset.currentIndex);
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            let originalIndex = currentIndex; // Store the original index to prevent infinite loop
+            do {
+                currentIndex = (currentIndex + 1) % images.length; // Move to the next index
+                if(currentIndex === originalIndex) {
+                    console.error('All images are locked.');
+                    return; // You can handle this case as per your app's needs
+                }
+            } while (lockedImages.includes(images[currentIndex].name)); // Check if the image is locked
+
+            parentDiv.style.backgroundImage = `url(${images[currentIndex].url})`;
+            parentDiv.dataset.currentIndex = currentIndex;
+        }
+
+        function prevImage(button) {
+            const parentDiv = button.parentElement;
+            let currentIndex = parseInt(parentDiv.dataset.currentIndex);
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            let originalIndex = currentIndex;
+
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+
+            while (lockedImages.includes(images[currentIndex].name)) {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                
+                if (currentIndex === originalIndex) {
+                    console.error('All images are locked.');
+                    return; // Exit the function if all images are locked
+                }
+            }
+
+            parentDiv.style.backgroundImage = `url(${images[currentIndex].url})`;
+            parentDiv.dataset.currentIndex = currentIndex;
+        }
+
+        function mouseEnter(parentDiv) {
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            if (images.length > 0 && !parentDiv.isLocked){
+                parentDiv.querySelector('.delete-button').style.display = 'block';
+                parentDiv.querySelector('.plus-button').style.display = 'block';
+            }
+            else if(images.length > 0 && parentDiv.isLocked){
+                parentDiv.querySelector('.delete-button').style.display = 'none';
+                parentDiv.querySelector('.plus-button').style.display = 'none';
+            }
+
+            if (images.length > 0){
+                parentDiv.querySelector('.lock-image').style.display = 'block';
+                if (parentDiv.isLocked){
+                    parentDiv.querySelector('.lock-image').innerText = 'Unlock';
+                }else{
+                    parentDiv.querySelector('.lock-image').innerText = 'Lock';
+                }
+            }
+
+            if (images.length > 1 && !parentDiv.isLocked) {
+                parentDiv.querySelector('.random-image').style.display = 'block';
+
+                parentDiv.querySelector('.next-image').style.display = 'block' ;
+                parentDiv.querySelector('.prev-image').style.display = 'block' ;
+            }
+            else if (images.length > 1 && parentDiv.isLocked) {
+                parentDiv.querySelector('.random-image').style.display = 'none';
+
+                parentDiv.querySelector('.next-image').style.display = 'none' ;
+                parentDiv.querySelector('.prev-image').style.display = 'none' ;
+            }
+            
+        }
+
+        function mouseLeft(parentDiv) {
+            const images = JSON.parse(parentDiv.dataset.images);
+
+            parentDiv.querySelector('.lock-image').style.display = 'none';
+            parentDiv.querySelector('.plus-button').style.display = 'none';
+            parentDiv.querySelector('.next-image').style.display = 'none';
+            parentDiv.querySelector('.prev-image').style.display = 'none';
+            parentDiv.querySelector('.random-image').style.display = 'none';
+            parentDiv.querySelector('.delete-button').style.display = 'none';
+
+
+        }
+
+        document.querySelectorAll('.image-container').forEach(div => {
+            div.addEventListener('click', () => {
+                div.querySelector('.upload').click();
+            });
+        });
+
+        function uploadWalls(){
+            //loop thru each gallery selection and 
+            for (let i=1; i<8; i++){
+                createGallery(i);
+            }
+        }
+
+        function updateWall(wall){
+            createGallery(wall);
+        }
+
+        function createGallery(wall) {
+            
+            const count = getValueOfWall(String(wall));
+            const id = 'g' + String(wall);
+            const container = document.getElementById(id);
+            const currentCount = container.getElementsByClassName('image-container').length;
+            
+            // Add new squares if needed
+            for(let i = currentCount; i < count; i++) {
+                const div = document.createElement('div');
+                div.classList.add('image-container');
+
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.classList.add('upload');
+                input.accept = 'image/*';
+                input.multiple = true;
+                input.addEventListener('change', function() { 
+                    uploadImagesToSquare(this, this.parentElement); });
+
+                const prevButton = document.createElement('button');
+                prevButton.innerText = "Previous";
+                prevButton.classList.add('prev-image');
+                prevButton.onclick = function() { prevImage(this); }
+
+                const nextButton = document.createElement('button');
+                nextButton.innerText = "Next";
+                nextButton.classList.add('next-image');
+                nextButton.onclick = function() { nextImage(this); }
+
+                const randomButton = document.createElement('button');
+                randomButton.innerText = "Random";
+                randomButton.classList.add('random-image');
+                randomButton.onclick = function() { randomize(this); }
+
+                const lockButton = document.createElement('button');
+                lockButton.innerText = "Lock";
+                lockButton.classList.add('lock-image');
+                lockButton.onclick = function() { lockImage(this); }
+
+                const buttonInput = document.createElement('input');
+                buttonInput.type = 'file';
+                buttonInput.accept = 'image/*';
+                buttonInput.classList.add('button-upload');
+                buttonInput.multiple = true;
+                buttonInput.addEventListener('change', function() { 
+                    addImage(this); 
+                });
+
+                const plusButton = document.createElement('div');
+                plusButton.classList.add('plus-button');
+
+                const deleteButton = document.createElement('div');
+                deleteButton.classList.add('delete-button');
+
+                
+                div.appendChild(buttonInput);
+                div.appendChild(lockButton);
+                div.appendChild(deleteButton);
+                div.appendChild(deleteButton);
+                div.appendChild(plusButton);
+                div.appendChild(input);
+                div.appendChild(prevButton);
+                div.appendChild(nextButton);
+                div.appendChild(randomButton);
+
+
+                container.appendChild(div);
+
+                div.addEventListener('click', function(event) {
+                    if (event.target === plusButton) {
+                        this.querySelector('.button-upload').click();
+                    }
+                    else if (event.target === deleteButton) {
+                        deleteImage(deleteButton, div);
+                    }
+                    else if (event.target === this) {
+                        input.value = '';
+                        this.querySelector('.upload').click();
+                    }
+                });
+
+                const parentDiv = this.parentElement;
+                div.addEventListener('mouseover', function(event) {
+                    if (event.target === this) {
+                        mouseEnter(div);
+                    }
+                });
+
+                div.addEventListener('mouseleave', function(event) {
+                    if (event.target === this) {
+                        mouseLeft(div);
+                    }
+                });
+
+            }
+
+            // Remove excess squares if needed
+            while (container.getElementsByClassName('image-container').length > count) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        // Initialize the value options on page load
+        window.onload = function() {
+            uploadWalls();
+        };
+
+        // Function to get the value of a specific wall
+        function getValueOfWall(wallNumber) {
+            var selectElement = document.getElementById('num-walls-select' + wallNumber);
+            var value = selectElement.value;
+            return value;
+        }
+
+        document.getElementById('image-input').addEventListener('click', function(e) {
+            e.target.value = null;
+        });
+
+        document.getElementById('image-input').addEventListener('change', function(e) {
+            lockedImages.length = 0;
+            document.querySelectorAll('.image-container').forEach(div => {
+                uploadImages(e.target, div);
+            });
+        });
+    </script>
+</body>
+</html>
